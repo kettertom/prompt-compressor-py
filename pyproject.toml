@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "prompt-compressor"
+version = "0.1.0"
+description = "Rule-based LLM prompt compression — 30+ algorithms, zero dependencies"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Tom Ketter" }]
+keywords = ["llm", "prompt", "compression", "tokens", "openai", "bedrock", "anthropic"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Text Processing",
+]
+requires-python = ">=3.9"
+dependencies = []  # zero dependencies
+
+[project.urls]
+Homepage = "https://prompt-compressor.com"
+Repository = "https://github.com/kettertom/prompt-compressor"
+"Bug Tracker" = "https://github.com/kettertom/prompt-compressor/issues"
+
+[project.scripts]
+prompt-compressor = "prompt_compressor.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["prompt_compressor"]
