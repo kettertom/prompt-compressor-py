@@ -22,12 +22,17 @@ def protect_variables(text: str) -> Tuple[str, Dict[str, str]]:
     Returns (protected_text, mapping) where mapping[placeholder] = original.
     """
     mapping: Dict[str, str] = {}
+    by_match: Dict[str, str] = {}
     index = 0
 
     def _replace(m: re.Match) -> str:
         nonlocal index
+        # Same variable → same placeholder, so duplicate lines still dedupe.
+        if m.group(0) in by_match:
+            return by_match[m.group(0)]
         placeholder = _PLACEHOLDER_TPL.format(index=index)
         mapping[placeholder] = m.group(0)
+        by_match[m.group(0)] = placeholder
         index += 1
         return placeholder
 

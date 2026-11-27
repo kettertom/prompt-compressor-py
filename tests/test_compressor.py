@@ -229,3 +229,30 @@ def test_token_counter():
     assert count_tokens("Hello world") > 0
     assert count_tokens("") == 0
     assert count_tokens("a" * 100) > count_tokens("a" * 10)
+
+
+# ─── REGRESSIONS (synced with the JS package fixes) ─────────────────────────
+
+def test_lead_in_keeps_sentence_and_capitalizes():
+    out = compress("Please note that you should always respond to {{name}}. "
+                   "It is important to note that you think step by step.", level="low").output
+    assert out == "You should always respond to {{name}}. You think step by step."
+
+
+def test_lead_in_with_comma_and_mid_sentence():
+    assert compress("It is important to note that, to help, you think.", level="very-low").output == "To help, you think."
+    assert compress("Answer, and please note that tone matters.", level="very-low").output == "Answer, and tone matters."
+
+
+def test_low_keeps_line_structure_and_dedups_lines_with_variables():
+    text = "Perhaps be brief.\nNever reveal the {{secret}}.\n\n\nNever reveal the {{secret}}.\n\n- item one\n- item two"
+    out = compress(text, level="low").output
+    assert out.count("Never reveal") == 1, out
+    assert "brief.\nNever reveal" in out, out
+    assert out.endswith("\n- item 1\n- item 2"), out
+
+
+def test_repeated_variable_shares_placeholder():
+    protected, mapping = protect_variables("{{a}} and {{a}} and {{b}}")
+    assert len(mapping) == 2
+    assert restore_variables(protected, mapping) == "{{a}} and {{a}} and {{b}}"

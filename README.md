@@ -9,7 +9,10 @@
 Compress prompts **before** sending them to any LLM API. No model required, no API calls, zero overhead. Works with OpenAI, Anthropic, AWS Bedrock, Cohere, or any token-based API.
 
 🌐 **Web app**: [prompt-compressor.com](https://prompt-compressor.com)  
-📦 **npm**: [prompt-compressor](https://www.npmjs.com/package/prompt-compressor)
+📦 **npm**: [prompt-compressor](https://www.npmjs.com/package/prompt-compressor)  
+🤖 **MCP server** (Claude, Cursor, VS Code): `claude mcp add prompt-compressor -- npx -y prompt-compressor-mcp`
+
+⭐ **Find it useful? [Star it on GitHub](https://github.com/kettertom/prompt-compressor-py)** · 🐛 **Found a bug or have an idea? [Open an issue](https://github.com/kettertom/prompt-compressor-py/issues/new)**
 
 ---
 

@@ -22,15 +22,19 @@ def dedup_exact_lines(text: str) -> str:
 
 def dedup_exact_sentences(text: str) -> str:
     """Remove duplicate sentences (keep first occurrence)."""
-    sentences = re.split(r"(?<=[.!?])\s+", text)
+    # split but keep separators, so line breaks and paragraphs survive
+    parts = re.split(r"((?<=[.!?])\s+)", text)
     seen = set()
-    result = []
-    for sent in sentences:
+    out = ""
+    for i in range(0, len(parts), 2):
+        sent, sep = parts[i], (parts[i + 1] if i + 1 < len(parts) else "")
         key = sent.strip().lower()
         if key not in seen:
             seen.add(key)
-            result.append(sent)
-    return " ".join(result)
+            out += sent + sep
+        elif "\n" in sep and not re.search(r"\n\s*$", out):
+            out = out.rstrip(" \t") + "\n"
+    return re.sub(r"\n{3,}", "\n\n", out).strip()
 
 
 # ─── FUZZY DEDUPLICATION (JACCARD) ──────────────────────────────────────────
