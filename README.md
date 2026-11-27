@@ -9,7 +9,7 @@
 Compress prompts **before** sending them to any LLM API. No model required, no API calls, zero overhead. Works with OpenAI, Anthropic, AWS Bedrock, Cohere, or any token-based API.
 
 **No model. No API key. Deterministic. Zero dependencies. Your data never leaves your machine.**
-Most prompt compressors (e.g. LLMLingua) run a language model to decide what to cut. This one uses 30+ rule-based algorithms, so the same input always gives the same output and it is safe for data you can't send anywhere. **At the default level it cut 20% of tokens across 8 real-world prompt types while keeping 94/94 critical instructions** ([benchmark](#benchmark)).
+Most prompt compressors (e.g. LLMLingua) run a language model to decide what to cut. This one uses 30+ rule-based algorithms, so the same input always gives the same output and it is safe for data you can't send anywhere. **At the default level it cut 25% of tokens across 8 real-world prompt types while keeping 94/94 critical instructions and leaving JSON intact** ([benchmark](#benchmark)).
 
 🌐 **Web app**: [prompt-compressor.com](https://prompt-compressor.com)  
 📦 **npm**: [prompt-compressor](https://www.npmjs.com/package/prompt-compressor)  
@@ -94,10 +94,12 @@ prompt-compressor input.txt --level low --output compressed.txt
 |-------|-----------|-------------------|
 | `none` | Whitespace, unicode, ANSI, punctuation | 3% avg (0–10%) |
 | `very-low` | + Filler removal, phrase shortening, JSON/SQL minify, license headers | 9% avg (1–31%) |
-| `low` ✅ default | + Hedging, meta-commentary, transitions, number normalization, code comments, exact dedup | **20% avg (0–61%)**, 100% of critical facts kept |
-| `medium` ⚠️ | + Fuzzy/ngram/Levenshtein dedup, frequent patterns, TF-IDF, TextRank | 86% avg, but **only 34% of critical facts kept** |
+| `low` ✅ default | + Hedging, meta-commentary, transitions, number normalization, code comments, exact dedup | **25% avg (0–61%)**, 100% of critical facts kept |
+| `medium` | + Near-duplicate removal (fuzzy / n-gram / Levenshtein), list grouping, TextRank on plain prose only | 26% avg (5–61%), 100% of critical facts kept |
 
-> ⚠️ **`medium` is lossy summarization, not compression.** It keeps a fraction of the sentences and can drop instructions, numbers and IDs. Use it only for background context you'd be happy to see summarized, never for system prompts, tool output or anything with rules in it. Savings are biggest on code, logs and repeated content. Prose that is already concise saves only a few percent at the safe levels.
+> **`medium` = `low` + near-duplicate removal + light summarization of plain prose.** Code blocks, lists, tables, `Key: value` lines, questions, and any sentence with a rule, number, ID or variable are never removed. On the dense prompts in the benchmark it saves about the same as `low` (26% vs 25%) and kept 94/94 critical facts. It helps most on long, chatty prose.
+
+> 🔧 **Upgrade to 0.1.2 or later.** In 0.1.1 and earlier, `medium` chained several summarizers and kept only about 34% of critical facts, and JSON null-field removal re-indented minified JSON (11% saving instead of 45%). Both are fixed.
 
 ## Variable Protection
 
@@ -123,34 +125,28 @@ The same 8 production-style prompts and must-keep facts as the [JS package bench
 | Support bot system prompt | 325 | 306 | **6%** | $57 | 12/12 ✅ |
 | RAG context (4 retrieved docs) | 431 | 338 | **22%** | $279 | 13/13 ✅ |
 | Agent instructions + tool specs | 333 | 316 | **5%** | $51 | 17/17 ✅ |
-| Tool output (JSON orders) | 448 | 398 | **11%** | $150 | 11/11 ✅ |
+| Tool output (JSON orders) | 448 | 248 | **45%** | $600 | 11/11 ✅ |
 | Code review request (Python) | 292 | 114 | **61%** | $534 | 9/9 ✅ |
 | Production logs + stack trace | 873 | 564 | **35%** | $927 | 9/9 ✅ |
 | Chat history (8 turns) | 310 | 309 | **0%** | $3 | 11/11 ✅ |
 | Email thread to summarize | 327 | 312 | **5%** | $45 | 12/12 ✅ |
-| **Total** | **3,339** | **2,657** | **20%** | **$2,046** | **94/94** |
+| **Total** | **3,339** | **2,507** | **25%** | **$2,496** | **94/94** |
 
 \* At $3 per 1M input tokens. For your model, multiply by (your price ÷ 3). Tokens counted with OpenAI's `o200k_base` tokenizer.
 
 ### By risk level
 
-| Level | Avg. saved | Must-keep facts kept |
-|---|---:|:---:|
-| `very-low` | 9% | 94/94 (100%) |
-| `low` | 20% | 94/94 (100%) |
-| `medium` | 86% | 32/94 (34%) |
+| Level | Avg. saved | Must-keep facts kept | JSON blocks intact |
+|---|---:|:---:|:---:|
+| `very-low` | 9% | 94/94 (100%) | 1/1 ✅ |
+| `low` | 25% | 94/94 (100%) | 1/1 ✅ |
+| `medium` | 26% | 94/94 (100%) | 1/1 ✅ |
+
+"JSON blocks intact" = every ```json block still parses and holds the same data as the original (null / empty fields are removed on purpose).
 
 Facts lost (if any):
 
-- `medium` · Support bot system prompt: lost 10/12
-- `medium` · RAG context (4 retrieved docs): lost 11/13
-- `medium` · Agent instructions + tool specs: lost 10/17
-- `medium` · Tool output (JSON orders): lost 11/11
-- `medium` · Production logs + stack trace: lost 8/9
-- `medium` · Chat history (8 turns): lost 5/11
-- `medium` · Email thread to summarize: lost 7/12
-
-The exact facts lost are listed in [`bench/results.json`](bench/results.json).
+- None: every must-keep fact survived at every level.
 
 **Reproduce it:** `pip install tiktoken && python bench/run.py`
 
@@ -195,20 +191,22 @@ The exact facts lost are listed in [`bench/results.json`](bench/results.json).
 ### Deduplication (low / medium)
 | Algorithm | Description |
 |-----------|-------------|
-| `dedup_exact_lines` | Consecutive duplicate lines |
-| `dedup_exact_sentences` | Exact duplicate sentences |
-| `dedup_fuzzy` | Jaccard similarity ≥ 0.85 |
-| `dedup_ngram` | N-gram overlap ≥ 0.7 |
-| `dedup_levenshtein` | Edit distance < 15% |
-| `remove_frequent_patterns` | Apriori-style repeated phrases |
+| `dedup_exact_lines` | Consecutive duplicate lines (never inside code blocks or on code/JSON-like lines) |
+| `dedup_exact_sentences` | Exact duplicate sentences (never inside code blocks) |
+| `dedup_fuzzy` | Jaccard similarity ≥ 0.85; numbers/IDs must match |
+| `dedup_ngram` | N-gram overlap ≥ 0.7; numbers/IDs must match |
+| `dedup_levenshtein` | Edit distance < 15%; numbers/IDs must match |
+| `remove_frequent_patterns` | Apriori-style repeated phrases (opt-in, not part of any level: cuts inside sentences) |
 | `trie_prefix_compress` | Bullet groups with shared prefix |
 
-### Extractive (medium)
+### Extractive (medium: `textrank_compress` only)
+Only plain prose sentences are candidates. Code blocks, lists, `Key: value` lines, questions and sentences with rules, numbers, IDs or variables are always kept.
+
 | Algorithm | Description |
 |-----------|-------------|
-| `tf_compress` | Keep sentences by term frequency |
-| `tfidf_compress` | Keep sentences by TF-IDF score |
-| `textrank_compress` | PageRank-style sentence scoring |
+| `tf_compress` | Drop lowest term-frequency prose sentences (opt-in) |
+| `tfidf_compress` | Drop lowest TF-IDF prose sentences (opt-in) |
+| `textrank_compress` | Drop least central prose sentences (PageRank-style) |
 
 ---
 
