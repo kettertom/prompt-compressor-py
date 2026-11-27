@@ -6,31 +6,25 @@
 | Support bot system prompt | 325 | 306 | **6%** | $57 | 12/12 ✅ |
 | RAG context (4 retrieved docs) | 431 | 338 | **22%** | $279 | 13/13 ✅ |
 | Agent instructions + tool specs | 333 | 316 | **5%** | $51 | 17/17 ✅ |
-| Tool output (JSON orders) | 448 | 398 | **11%** | $150 | 11/11 ✅ |
+| Tool output (JSON orders) | 448 | 248 | **45%** | $600 | 11/11 ✅ |
 | Code review request (Python) | 292 | 114 | **61%** | $534 | 9/9 ✅ |
 | Production logs + stack trace | 873 | 564 | **35%** | $927 | 9/9 ✅ |
 | Chat history (8 turns) | 310 | 309 | **0%** | $3 | 11/11 ✅ |
 | Email thread to summarize | 327 | 312 | **5%** | $45 | 12/12 ✅ |
-| **Total** | **3,339** | **2,657** | **20%** | **$2,046** | **94/94** |
+| **Total** | **3,339** | **2,507** | **25%** | **$2,496** | **94/94** |
 
 \* At $3 per 1M input tokens. For your model, multiply by (your price ÷ 3). Tokens counted with OpenAI's `o200k_base` tokenizer.
 
 ### By risk level
 
-| Level | Avg. saved | Must-keep facts kept |
-|---|---:|:---:|
-| `very-low` | 9% | 94/94 (100%) |
-| `low` | 20% | 94/94 (100%) |
-| `medium` | 86% | 32/94 (34%) |
+| Level | Avg. saved | Must-keep facts kept | JSON blocks intact |
+|---|---:|:---:|:---:|
+| `very-low` | 9% | 94/94 (100%) | 1/1 ✅ |
+| `low` | 25% | 94/94 (100%) | 1/1 ✅ |
+| `medium` | 26% | 94/94 (100%) | 1/1 ✅ |
+
+"JSON blocks intact" = every ```json block still parses and holds the same data as the original (null / empty fields are removed on purpose).
 
 Facts lost (if any):
 
-- `medium` · Support bot system prompt: lost 10/12
-- `medium` · RAG context (4 retrieved docs): lost 11/13
-- `medium` · Agent instructions + tool specs: lost 10/17
-- `medium` · Tool output (JSON orders): lost 11/11
-- `medium` · Production logs + stack trace: lost 8/9
-- `medium` · Chat history (8 turns): lost 5/11
-- `medium` · Email thread to summarize: lost 7/12
-
-The exact facts lost are listed in [`bench/results.json`](results.json).
+- None: every must-keep fact survived at every level.

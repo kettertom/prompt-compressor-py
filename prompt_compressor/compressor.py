@@ -7,8 +7,9 @@ Levels:
   low       — + hedging, meta-commentary, transitions, parentheticals,
                number/date normalization, code comments, JSON/SQL minify,
                base64/hex stripping, stack traces, exact dedup (25–45%)
-  medium    — + fuzzy/ngram/levenshtein dedup, frequent patterns, trie,
-               TF-IDF, TextRank (30–70%)
+  medium    — + fuzzy/ngram/levenshtein dedup, trie list grouping,
+               TextRank on plain prose only (code, lists, questions and
+               sentences with rules/numbers/IDs are always kept)
 """
 
 from __future__ import annotations
@@ -98,12 +99,13 @@ def compress(
 
             if level == "medium":
                 # ── MEDIUM ──────────────────────────────────────────────────
+                # Only whole "soft" prose sentences are ever dropped here: code,
+                # lists, questions and anything with rules/numbers/IDs is kept.
+                # One summarizer only (they used to be chained: ~25% kept).
                 text = deduplication.dedup_fuzzy(text)
                 text = deduplication.dedup_ngram(text)
                 text = deduplication.dedup_levenshtein(text)
-                text = deduplication.remove_frequent_patterns(text)
                 text = deduplication.trie_prefix_compress(text)
-                text = extractive.tfidf_compress(text)
                 text = extractive.textrank_compress(text)
 
     # Restore variables

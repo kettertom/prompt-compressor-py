@@ -62,16 +62,21 @@ def minify_json(text: str) -> str:
 
 
 def remove_null_json_fields(text: str) -> str:
-    """Remove null/None fields from JSON code blocks."""
+    """Remove null, empty-string and empty-list fields (at any depth) from JSON
+    code blocks. Output stays compact so it doesn't undo minify_json."""
+    def _clean(v):
+        if isinstance(v, dict):
+            return {k: _clean(x) for k, x in v.items() if not (x is None or x == "" or x == [])}
+        if isinstance(v, list):
+            return [_clean(x) for x in v if not (x is None or x == "" or x == [])]
+        return v
+
     def _remove_nulls(m: re.Match) -> str:
         try:
-            parsed = json.loads(m.group(1))
-            if isinstance(parsed, dict):
-                cleaned = {k: v for k, v in parsed.items() if v is not None}
-                return f"```json\n{json.dumps(cleaned, indent=2, ensure_ascii=False)}\n```"
+            cleaned = _clean(json.loads(m.group(1)))
+            return f"```json\n{json.dumps(cleaned, separators=(',', ':'), ensure_ascii=False)}\n```"
         except (json.JSONDecodeError, ValueError):
-            pass
-        return m.group(0)
+            return m.group(0)
 
     return re.sub(r"```json\n([\s\S]*?)```", _remove_nulls, text)
 

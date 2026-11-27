@@ -5,6 +5,8 @@ import math
 from collections import Counter
 from typing import List, Dict, Tuple
 
+from ._units import summarize_by
+
 
 def _split_sentences(text: str) -> List[str]:
     return [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if s.strip()]
@@ -29,74 +31,45 @@ STOPWORDS = {
 
 # ─── TF COMPRESSION ──────────────────────────────────────────────────────────
 
-def tf_compress(text: str, keep_ratio: float = 0.6) -> str:
+def tf_compress(text: str, keep_ratio: float = 0.75) -> str:
     """
-    Score each sentence by the average term frequency of its non-stopword tokens.
-    Keep the top `keep_ratio` fraction of sentences (by score), preserving order.
+    Drop the lowest-scoring prose sentences by term frequency.
+    `keep_ratio` is the fraction of *droppable* prose sentences to keep.
+    Code blocks, structured lines, questions and sentences with rules,
+    numbers, IDs or variables are always kept.
     """
-    sentences = _split_sentences(text)
-    if len(sentences) <= 3:
-        return text
-
-    # Compute TF over full document
-    all_tokens = _tokenize(text)
-    tf: Counter = Counter(t for t in all_tokens if t not in STOPWORDS)
-    total = sum(tf.values()) or 1
-
-    def _score(sent: str) -> float:
-        tokens = [t for t in _tokenize(sent) if t not in STOPWORDS]
-        if not tokens:
-            return 0.0
-        return sum(tf[t] / total for t in tokens) / len(tokens)
-
-    scored = [(i, s, _score(s)) for i, s in enumerate(sentences)]
-    threshold = sorted([x[2] for x in scored], reverse=True)[
-        max(0, int(len(scored) * keep_ratio) - 1)
-    ]
-    kept = [s for i, s, score in scored if score >= threshold]
-    return " ".join(kept)
+    def scores(sents: List[str]) -> List[float]:
+        tf: Counter = Counter(t for s in sents for t in _tokenize(s) if t not in STOPWORDS)
+        out = []
+        for s in sents:
+            toks = [t for t in _tokenize(s) if t not in STOPWORDS]
+            out.append(sum(tf[t] for t in toks) / len(toks) if toks else 0.0)
+        return out
+    return summarize_by(text, keep_ratio, scores)
 
 
 # ─── TF-IDF COMPRESSION ──────────────────────────────────────────────────────
 
-def tfidf_compress(text: str, keep_ratio: float = 0.6) -> str:
+def tfidf_compress(text: str, keep_ratio: float = 0.75) -> str:
     """
-    Score each sentence by TF-IDF, treating each sentence as a document.
-    Keep the top `keep_ratio` fraction.
+    Drop the lowest-scoring prose sentences by TF-IDF.
+    `keep_ratio` is the fraction of *droppable* prose sentences to keep.
+    Code blocks, structured lines, questions and sentences with rules,
+    numbers, IDs or variables are always kept.
     """
-    sentences = _split_sentences(text)
-    if len(sentences) <= 3:
-        return text
-
-    # Tokenize per sentence
-    sent_tokens = [
-        [t for t in _tokenize(s) if t not in STOPWORDS]
-        for s in sentences
-    ]
-    N = len(sentences)
-
-    # IDF
-    df: Counter = Counter()
-    for tokens in sent_tokens:
-        for t in set(tokens):
-            df[t] += 1
-
-    def _idf(term: str) -> float:
-        return math.log((N + 1) / (df.get(term, 0) + 1)) + 1
-
-    def _score(tokens: List[str]) -> float:
-        if not tokens:
-            return 0.0
-        tf: Counter = Counter(tokens)
-        total = len(tokens)
-        return sum((tf[t] / total) * _idf(t) for t in tokens) / len(tokens)
-
-    scored = [(i, sentences[i], _score(sent_tokens[i])) for i in range(N)]
-    threshold = sorted([x[2] for x in scored], reverse=True)[
-        max(0, int(len(scored) * keep_ratio) - 1)
-    ]
-    kept = [s for i, s, score in scored if score >= threshold]
-    return " ".join(kept)
+    def scores(sents: List[str]) -> List[float]:
+        toks = [[t for t in _tokenize(s) if t not in STOPWORDS] for s in sents]
+        n = len(sents)
+        df: Counter = Counter(t for ts in toks for t in set(ts))
+        out = []
+        for ts in toks:
+            if not ts:
+                out.append(0.0)
+                continue
+            tf = Counter(ts)
+            out.append(sum((tf[t] / len(ts)) * math.log((n + 1) / (df[t] + 1)) for t in ts) / len(ts))
+        return out
+    return summarize_by(text, keep_ratio, scores)
 
 
 # ─── TEXTRANK COMPRESSION ────────────────────────────────────────────────────
@@ -109,43 +82,21 @@ def _similarity(tokens_a: set, tokens_b: set) -> float:
     return len(intersection) / denom if denom else 0.0
 
 
-def textrank_compress(text: str, keep_ratio: float = 0.5, damping: float = 0.85, iterations: int = 30) -> str:
+def textrank_compress(text: str, keep_ratio: float = 0.75, damping: float = 0.85, iterations: int = 30) -> str:
     """
-    PageRank-style sentence scoring. Keep top `keep_ratio` sentences by rank.
+    TextRank: drop the least "central" prose sentences.
+    `keep_ratio` is the fraction of *droppable* prose sentences to keep.
+    Code blocks, structured lines, questions and sentences with rules,
+    numbers, IDs or variables are always kept.
     """
-    sentences = _split_sentences(text)
-    if len(sentences) <= 3:
-        return text
-
-    sent_tokens = [
-        set(_tokenize(s)) - STOPWORDS
-        for s in sentences
-    ]
-    N = len(sentences)
-
-    # Build similarity matrix
-    sim: List[List[float]] = [[0.0] * N for _ in range(N)]
-    for i in range(N):
-        for j in range(N):
-            if i != j:
-                sim[i][j] = _similarity(sent_tokens[i], sent_tokens[j])
-
-    # Normalize rows
-    for i in range(N):
-        row_sum = sum(sim[i]) or 1
-        sim[i] = [v / row_sum for v in sim[i]]
-
-    # Power iteration
-    scores = [1.0 / N] * N
-    for _ in range(iterations):
-        new_scores = [
-            (1 - damping) / N + damping * sum(sim[j][i] * scores[j] for j in range(N))
-            for i in range(N)
-        ]
-        scores = new_scores
-
-    # Keep top keep_ratio sentences, preserve original order
-    n_keep = max(1, int(N * keep_ratio))
-    top_indices = set(sorted(range(N), key=lambda i: scores[i], reverse=True)[:n_keep])
-    kept = [sentences[i] for i in range(N) if i in top_indices]
-    return " ".join(kept)
+    def scores(sents: List[str]) -> List[float]:
+        n = len(sents)
+        sets = [set(t for t in _tokenize(s) if t not in STOPWORDS) for s in sents]
+        sim = [[0.0 if i == j else _similarity(sets[i], sets[j]) for j in range(n)] for i in range(n)]
+        row = [sum(r) for r in sim]
+        sc = [1.0 / n] * n
+        for _ in range(iterations):
+            sc = [(1 - damping) / n + damping * sum(sc[j] * (sim[j][i] / row[j] if row[j] else 1.0 / n) for j in range(n))
+                  for i in range(n)]
+        return sc
+    return summarize_by(text, keep_ratio, scores)

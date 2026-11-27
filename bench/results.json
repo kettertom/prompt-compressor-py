@@ -12,6 +12,7 @@
       "factsKept": 12,
       "factsTotal": 12,
       "missing": [],
+      "jsonIntact": null,
       "dollarsPer1MCalls": 57.0
     },
     {
@@ -24,6 +25,7 @@
       "factsKept": 12,
       "factsTotal": 12,
       "missing": [],
+      "jsonIntact": null,
       "dollarsPer1MCalls": 57.0
     },
     {
@@ -31,23 +33,13 @@
       "label": "Support bot system prompt",
       "level": "medium",
       "before": 325,
-      "after": 57,
-      "pct": 82.46153846153847,
-      "factsKept": 2,
+      "after": 306,
+      "pct": 5.846153846153846,
+      "factsKept": 12,
       "factsTotal": 12,
-      "missing": [
-        "never share customer data",
-        "last 4 digits",
-        "30 days",
-        "20%",
-        "SORRY20",
-        "Tier 2",
-        "escalate_ticket",
-        "24 hours",
-        "roadmap",
-        "anything else"
-      ],
-      "dollarsPer1MCalls": 804.0
+      "missing": [],
+      "jsonIntact": null,
+      "dollarsPer1MCalls": 57.0
     },
     {
       "file": "02-rag-context.txt",
@@ -59,6 +51,7 @@
       "factsKept": 13,
       "factsTotal": 13,
       "missing": [],
+      "jsonIntact": null,
       "dollarsPer1MCalls": 81.0
     },
     {
@@ -71,6 +64,7 @@
       "factsKept": 13,
       "factsTotal": 13,
       "missing": [],
+      "jsonIntact": null,
       "dollarsPer1MCalls": 279.0
     },
     {
@@ -78,24 +72,13 @@
       "label": "RAG context (4 retrieved docs)",
       "level": "medium",
       "before": 431,
-      "after": 48,
-      "pct": 88.8631090487239,
-      "factsKept": 2,
+      "after": 311,
+      "pct": 27.842227378190255,
+      "factsKept": 13,
       "factsTotal": 13,
-      "missing": [
-        "(three|3)\\)? days",
-        "10:00",
-        "16:00",
-        "\\$300",
-        "roll over",
-        "full-disk encryption",
-        "VPN",
-        "1 hour",
-        "security@company\\.example",
-        "\\{question\\}",
-        "(don't|do not) know"
-      ],
-      "dollarsPer1MCalls": 1149.0
+      "missing": [],
+      "jsonIntact": null,
+      "dollarsPer1MCalls": 360.0
     },
     {
       "file": "03-agent-instructions.txt",
@@ -107,6 +90,7 @@
       "factsKept": 17,
       "factsTotal": 17,
       "missing": [],
+      "jsonIntact": null,
       "dollarsPer1MCalls": 57.0
     },
     {
@@ -119,6 +103,7 @@
       "factsKept": 17,
       "factsTotal": 17,
       "missing": [],
+      "jsonIntact": null,
       "dollarsPer1MCalls": 51.0
     },
     {
@@ -126,23 +111,13 @@
       "label": "Agent instructions + tool specs",
       "level": "medium",
       "before": 333,
-      "after": 93,
-      "pct": 72.07207207207207,
-      "factsKept": 7,
+      "after": 316,
+      "pct": 5.105105105105105,
+      "factsKept": 17,
       "factsTotal": 17,
-      "missing": [
-        "write_file",
-        "cite",
-        "never make up numbers",
-        "not found",
-        "500 words",
-        "\\{\\{ticker\\}\\}",
-        "Summary",
-        "Business Model",
-        "Risks",
-        "Verdict"
-      ],
-      "dollarsPer1MCalls": 720.0
+      "missing": [],
+      "jsonIntact": null,
+      "dollarsPer1MCalls": 51.0
     },
     {
       "file": "04-tool-output-json.txt",
@@ -154,6 +129,7 @@
       "factsKept": 11,
       "factsTotal": 11,
       "missing": [],
+      "jsonIntact": true,
       "dollarsPer1MCalls": 411.0
     },
     {
@@ -161,36 +137,26 @@
       "label": "Tool output (JSON orders)",
       "level": "low",
       "before": 448,
-      "after": 398,
-      "pct": 11.160714285714286,
+      "after": 248,
+      "pct": 44.642857142857146,
       "factsKept": 11,
       "factsTotal": 11,
       "missing": [],
-      "dollarsPer1MCalls": 150.0
+      "jsonIntact": true,
+      "dollarsPer1MCalls": 600.0
     },
     {
       "file": "04-tool-output-json.txt",
       "label": "Tool output (JSON orders)",
       "level": "medium",
       "before": 448,
-      "after": 20,
-      "pct": 95.53571428571429,
-      "factsKept": 0,
+      "after": 248,
+      "pct": 44.642857142857146,
+      "factsKept": 11,
       "factsTotal": 11,
-      "missing": [
-        "ORD-55012",
-        "ORD-55377",
-        "ORD-55401",
-        "shipped",
-        "processing",
-        "1Z999AA10123456784",
-        "Wireless Mouse",
-        "27-inch Monitor",
-        "399",
-        "89",
-        "\"gift_wrap\":\\s*true"
-      ],
-      "dollarsPer1MCalls": 1284.0
+      "missing": [],
+      "jsonIntact": true,
+      "dollarsPer1MCalls": 600.0
     },
     {
       "file": "05-code-review.txt",
@@ -202,6 +168,7 @@
       "factsKept": 9,
       "factsTotal": 9,
       "missing": [],
+      "jsonIntact": null,
       "dollarsPer1MCalls": 156.0
     },
     {
@@ -214,6 +181,7 @@
       "factsKept": 9,
       "factsTotal": 9,
       "missing": [],
+      "jsonIntact": null,
       "dollarsPer1MCalls": 534.0
     },
     {
@@ -226,6 +194,7 @@
       "factsKept": 9,
       "factsTotal": 9,
       "missing": [],
+      "jsonIntact": null,
       "dollarsPer1MCalls": 534.0
     },
     {
@@ -238,6 +207,7 @@
       "factsKept": 9,
       "factsTotal": 9,
       "missing": [],
+      "jsonIntact": null,
       "dollarsPer1MCalls": 75.0
     },
     {
@@ -250,6 +220,7 @@
       "factsKept": 9,
       "factsTotal": 9,
       "missing": [],
+      "jsonIntact": null,
       "dollarsPer1MCalls": 927.0
     },
     {
@@ -257,21 +228,13 @@
       "label": "Production logs + stack trace",
       "level": "medium",
       "before": 873,
-      "after": 27,
-      "pct": 96.90721649484536,
-      "factsKept": 1,
+      "after": 564,
+      "pct": 35.39518900343643,
+      "factsKept": 9,
       "factsTotal": 9,
-      "missing": [
-        "5000ms",
-        "stripe-eu",
-        "ReadTimeout",
-        "attempt 3/3",
-        "permanently failed",
-        "size=10",
-        "30s to 5s",
-        "2026\\.11\\.27-3"
-      ],
-      "dollarsPer1MCalls": 2538.0
+      "missing": [],
+      "jsonIntact": null,
+      "dollarsPer1MCalls": 927.0
     },
     {
       "file": "07-chat-history.txt",
@@ -283,6 +246,7 @@
       "factsKept": 11,
       "factsTotal": 11,
       "missing": [],
+      "jsonIntact": null,
       "dollarsPer1MCalls": 6.0
     },
     {
@@ -295,6 +259,7 @@
       "factsKept": 11,
       "factsTotal": 11,
       "missing": [],
+      "jsonIntact": null,
       "dollarsPer1MCalls": 3.0
     },
     {
@@ -302,18 +267,13 @@
       "label": "Chat history (8 turns)",
       "level": "medium",
       "before": 310,
-      "after": 53,
-      "pct": 82.90322580645162,
-      "factsKept": 6,
+      "after": 286,
+      "pct": 7.741935483870968,
+      "factsKept": 11,
       "factsTotal": 11,
-      "missing": [
-        "Lisbon",
-        "March",
-        "150 euros",
-        "hotel",
-        "day trip"
-      ],
-      "dollarsPer1MCalls": 771.0
+      "missing": [],
+      "jsonIntact": null,
+      "dollarsPer1MCalls": 72.0
     },
     {
       "file": "08-email-thread.txt",
@@ -325,6 +285,7 @@
       "factsKept": 12,
       "factsTotal": 12,
       "missing": [],
+      "jsonIntact": null,
       "dollarsPer1MCalls": 27.0
     },
     {
@@ -337,6 +298,7 @@
       "factsKept": 12,
       "factsTotal": 12,
       "missing": [],
+      "jsonIntact": null,
       "dollarsPer1MCalls": 45.0
     },
     {
@@ -344,20 +306,13 @@
       "label": "Email thread to summarize",
       "level": "medium",
       "before": 327,
-      "after": 60,
-      "pct": 81.65137614678899,
-      "factsKept": 5,
+      "after": 312,
+      "pct": 4.587155963302752,
+      "factsKept": 12,
       "factsTotal": 12,
-      "missing": [
-        "January 15",
-        "February 3",
-        "regression testing",
-        "billing page",
-        "Q2",
-        "end of the week",
-        "staging"
-      ],
-      "dollarsPer1MCalls": 801.0
+      "missing": [],
+      "jsonIntact": null,
+      "dollarsPer1MCalls": 45.0
     }
   ]
 }
