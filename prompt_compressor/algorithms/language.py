@@ -19,16 +19,6 @@ FILLER_PATTERNS = [
     (r"\bdue to the fact that\b", "because"),
     (r"\bIn the event that\b", "If"),
     (r"\bin the event that\b", "if"),
-    (r"\bIt is important to note that\s*", ""),
-    (r"\bit is important to note that\s*", ""),
-    (r"\bIt should be noted that\s*", ""),
-    (r"\bit should be noted that\s*", ""),
-    (r"\bIt is worth noting that\s*", ""),
-    (r"\bit is worth noting that\s*", ""),
-    (r"\bPlease note that\s*", ""),
-    (r"\bplease note that\s*", ""),
-    (r"\bAs mentioned (?:above|previously|earlier),?\s*", ""),
-    (r"\bas mentioned (?:above|previously|earlier),?\s*", ""),
     # Trailing filler
     (r",?\s*as (?:mentioned|stated|noted) (?:above|previously|earlier)\.?", "."),
     (r"\s+in order to achieve this\b", ""),
@@ -36,7 +26,36 @@ FILLER_PATTERNS = [
 ]
 
 
+# Lead-ins whose sentence must be KEPT: drop only the phrase, then capitalize
+# the next word when the phrase started a sentence.
+LEAD_IN_PATTERNS = [
+    r"\bit is important to note that,?\s*",
+    r"\bit should be noted that,?\s*",
+    r"\bit is worth noting that,?\s*",
+    r"\bplease note that,?\s*",
+    r"\bas mentioned (?:above|previously|earlier),?\s*",
+]
+_LEAD_IN = re.compile("|".join(LEAD_IN_PATTERNS), re.IGNORECASE)
+_SENTENCE_START = re.compile(r"(?:^|[.!?:]\s*|\n\s*)$")
+
+
+def _drop_lead_ins(text: str) -> str:
+    out, pos = [], 0
+    for m in _LEAD_IN.finditer(text):
+        out.append(text[pos:m.start()])
+        before = "".join(out)
+        rest = text[m.end():]
+        if _SENTENCE_START.search(before) and rest[:1].isalpha():
+            out.append(rest[0].upper())
+            pos = m.end() + 1
+        else:
+            pos = m.end()
+    out.append(text[pos:])
+    return "".join(out)
+
+
 def remove_fillers(text: str) -> str:
+    text = _drop_lead_ins(text)
     for pattern, replacement in FILLER_PATTERNS:
         text = re.sub(pattern, replacement, text)
     return text
@@ -158,9 +177,13 @@ TRANSITION_REMOVALS = [
 
 def remove_transitions(text: str) -> str:
     """Remove redundant transition words at the start of sentences."""
-    sentences = re.split(r"(?<=[.!?])\s+", text)
+    # split but keep separators, so line breaks and paragraphs survive
+    parts = re.split(r"((?<=[.!?])\s+)", text)
     result = []
-    for sent in sentences:
+    for i, sent in enumerate(parts):
+        if i % 2:  # separator
+            result.append(sent)
+            continue
         for pattern in TRANSITION_REMOVALS:
             new_sent = re.sub(pattern, "", sent, flags=re.IGNORECASE)
             if new_sent != sent:
@@ -169,7 +192,7 @@ def remove_transitions(text: str) -> str:
                 sent = new_sent
                 break  # one removal per sentence
         result.append(sent)
-    return " ".join(result)
+    return "".join(result)
 
 
 # ─── PARENTHETICAL REMOVAL ───────────────────────────────────────────────────
