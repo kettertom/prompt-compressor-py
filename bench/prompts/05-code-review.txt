@@ -1,0 +1,42 @@
+Please review the following function for bugs and suggest improvements. It is important that you focus on correctness first and style second.
+
+```python
+# ---------------------------------------------------------------
+# Copyright (c) 2026 Example Corp. All rights reserved.
+# Licensed under the Example Corp internal license, version 2.
+# Unauthorized copying of this file is strictly prohibited.
+# ---------------------------------------------------------------
+
+def calculate_discount(price, customer_type, coupon_code=None):
+    """
+    Calculate the discounted price for a customer.
+
+    Args:
+        price: The original price of the item, as a float.
+        customer_type: The type of customer, either "regular" or "vip".
+        coupon_code: An optional coupon code string.
+
+    Returns:
+        The final price after all discounts are applied.
+    """
+    # Start with the original price
+    final_price = price
+
+    # VIP customers get 10% off
+    if customer_type == "vip":
+        final_price = final_price * 0.9  # apply the VIP discount
+
+    # Apply coupon if present
+    if coupon_code == "SAVE20":
+        # 20 percent off
+        final_price = final_price - price * 0.2
+
+    # Make sure the price is never negative
+    if final_price < 0:
+        final_price = 0
+
+    # Return the final price
+    return final_price
+```
+
+The function is called from the checkout service for every order.

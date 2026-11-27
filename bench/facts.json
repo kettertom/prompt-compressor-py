@@ -1,0 +1,154 @@
+{
+  "01-support-system-prompt.txt": {
+    "label": "Support bot system prompt",
+    "mustKeep": [
+      "never share customer data",
+      "last 4 digits",
+      "30 days",
+      "20%",
+      "SORRY20",
+      "Tier 2",
+      "escalate_ticket",
+      "24 hours",
+      "roadmap",
+      "anything else",
+      "\\{\\{customer_name\\}\\}",
+      "\\{\\{plan_name\\}\\}"
+    ],
+    "probe": "Hi, I bought my plan 45 days ago and I want a full refund. Can you also tell me the account email for card ending 4417?",
+    "vars": {
+      "{{customer_name}}": "Maya",
+      "{{plan_name}}": "Pro"
+    }
+  },
+  "02-rag-context.txt": {
+    "label": "RAG context (4 retrieved docs)",
+    "mustKeep": [
+      "(three|3)\\)? days",
+      "10:00",
+      "16:00",
+      "Tuesdays",
+      "\\$300",
+      "roll over",
+      "60 days",
+      "full-disk encryption",
+      "VPN",
+      "1 hour",
+      "security@company\\.example",
+      "\\{question\\}",
+      "(don't|do not) know"
+    ],
+    "probe": "How many days a week can I work from home, and is there a day I must be in the office?",
+    "vars": {
+      "{question}": "How many days a week can I work from home, and is there a day I must be in the office?"
+    }
+  },
+  "03-agent-instructions.txt": {
+    "label": "Agent instructions + tool specs",
+    "mustKeep": [
+      "search_web",
+      "fetch_page",
+      "get_financials",
+      "write_file",
+      "(5|five) times",
+      "cite",
+      "never make up numbers",
+      "not found",
+      "private",
+      "500 words",
+      "/workspace/memos",
+      "\\{\\{ticker\\}\\}",
+      "Summary",
+      "Business Model",
+      "Financials",
+      "Risks",
+      "Verdict"
+    ],
+    "probe": "Research the private company Stripe and write the memo. Which tools will you call, in what order, and where will you save the file?",
+    "vars": {
+      "{{ticker}}": "STRIPE"
+    }
+  },
+  "04-tool-output-json.txt": {
+    "label": "Tool output (JSON orders)",
+    "mustKeep": [
+      "ORD-55012",
+      "ORD-55377",
+      "ORD-55401",
+      "shipped",
+      "processing",
+      "1Z999AA10123456784",
+      "Wireless Mouse",
+      "27-inch Monitor",
+      "399",
+      "89",
+      "\"gift_wrap\":\\s*true"
+    ],
+    "probe": "Which orders are still open, and what is their combined total?"
+  },
+  "05-code-review.txt": {
+    "label": "Code review request (Python)",
+    "mustKeep": [
+      "def calculate_discount",
+      "customer_type == \"vip\"",
+      "final_price \\* 0\\.9",
+      "SAVE20",
+      "price \\* 0\\.2",
+      "final_price < 0",
+      "return final_price",
+      "correctness",
+      "checkout"
+    ],
+    "probe": "What is the main bug in this function?"
+  },
+  "06-logs.txt": {
+    "label": "Production logs + stack trace",
+    "mustKeep": [
+      "5000ms",
+      "stripe-eu",
+      "ReadTimeout",
+      "attempt 3/3",
+      "permanently failed",
+      "size=10",
+      "30s to 5s",
+      "2026\\.11\\.27-3",
+      "root cause"
+    ],
+    "probe": "What is the most likely root cause, in one sentence?"
+  },
+  "07-chat-history.txt": {
+    "label": "Chat history (8 turns)",
+    "mustKeep": [
+      "Lisbon",
+      "March",
+      "(4|four) days",
+      "food",
+      "history",
+      "walking",
+      "museums",
+      "150 euros",
+      "hotel",
+      "vegetarian",
+      "day trip"
+    ],
+    "probe": "Give me the plan for day 1 only."
+  },
+  "08-email-thread.txt": {
+    "label": "Email thread to summarize",
+    "mustKeep": [
+      "January 15",
+      "February 3",
+      "January 10",
+      "regression testing",
+      "feature list",
+      "marketing",
+      "Omer",
+      "billing page",
+      "Q2",
+      "end of the week",
+      "staging",
+      "3 bullet points"
+    ],
+    "probe": "What is the new launch date and who owes what by when?"
+  }
+}

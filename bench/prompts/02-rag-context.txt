@@ -1,0 +1,15 @@
+Use the following retrieved documents to answer the user's question. If the answer is not contained in the documents, say that you don't know.
+
+[Document 1 — Employee Handbook, Section 4.2: Remote Work]
+Employees are eligible to work remotely for up to three (3) days per week, subject to the approval of their direct manager. It should be noted that remote work arrangements must be documented in the HR portal no later than the last business day of the preceding month. Employees who are working remotely are expected to be available during core hours, which are defined as 10:00 to 16:00 local time. In order to maintain team cohesion, all employees are required to be present in the office on Tuesdays.
+
+[Document 2 — Employee Handbook, Section 4.3: Equipment]
+The company will provide each remote employee with one (1) laptop, one (1) external monitor and a stipend of $300 per year for home office equipment. It is important to note that the stipend does not roll over to the following year. Employees should submit receipts through the expense system within 60 days of purchase in order to be reimbursed.
+
+[Document 3 — Employee Handbook, Section 4.2: Remote Work]
+Employees are eligible to work remotely for up to three (3) days per week, subject to the approval of their direct manager. It should be noted that remote work arrangements must be documented in the HR portal no later than the last business day of the preceding month. Employees who are working remotely are expected to be available during core hours, which are defined as 10:00 to 16:00 local time. In order to maintain team cohesion, all employees are required to be present in the office on Tuesdays.
+
+[Document 4 — IT Security Policy, Section 2.1]
+Basically, all devices that are used for work purposes must have full-disk encryption enabled. Please note that the use of public Wi-Fi networks is only permitted when connected through the company VPN. Lost or stolen devices must be reported to security@company.example within 1 hour of discovery.
+
+Question: {question}

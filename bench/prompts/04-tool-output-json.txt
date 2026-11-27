@@ -1,0 +1,48 @@
+Here is the result of the get_orders tool call. Please summarize the open orders for the user.
+
+```json
+{
+  "customer_id": "C-10293",
+  "orders": [
+    {
+      "order_id": "ORD-55012",
+      "status": "shipped",
+      "total": 149.90,
+      "currency": "USD",
+      "items": [
+        { "sku": "KB-201", "name": "Mechanical Keyboard", "qty": 1, "price": 129.90, "discount": null, "gift_wrap": false, "notes": "" },
+        { "sku": "CBL-01", "name": "USB-C Cable", "qty": 1, "price": 20.00, "discount": null, "gift_wrap": false, "notes": "" }
+      ],
+      "tracking_number": "1Z999AA10123456784",
+      "coupon": null,
+      "metadata": {}
+    },
+    {
+      "order_id": "ORD-55377",
+      "status": "processing",
+      "total": 89.00,
+      "currency": "USD",
+      "items": [
+        { "sku": "MS-310", "name": "Wireless Mouse", "qty": 2, "price": 44.50, "discount": null, "gift_wrap": true, "notes": "" }
+      ],
+      "tracking_number": null,
+      "coupon": null,
+      "metadata": {}
+    },
+    {
+      "order_id": "ORD-55401",
+      "status": "processing",
+      "total": 399.00,
+      "currency": "USD",
+      "items": [
+        { "sku": "MN-27Q", "name": "27-inch Monitor", "qty": 1, "price": 399.00, "discount": null, "gift_wrap": false, "notes": "" }
+      ],
+      "tracking_number": null,
+      "coupon": null,
+      "metadata": {}
+    }
+  ],
+  "next_page_token": null,
+  "warnings": []
+}
+```

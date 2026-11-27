@@ -1,0 +1,33 @@
+Summarize this email thread in 3 bullet points and list any action items with owners and deadlines.
+
+From: Dana Levi
+To: Product Team
+Subject: Q1 launch timeline
+
+Hi everyone,
+
+I hope this email finds you well. I just wanted to quickly follow up on our meeting from yesterday regarding the Q1 launch. As we discussed, it seems that we are basically in agreement that the launch date should be moved from January 15 to February 3, in order to give the QA team enough time to complete regression testing.
+
+It is important to note that marketing will need the final feature list no later than January 10 so that they can prepare the launch materials. Omer, could you please take ownership of sending the final feature list to marketing?
+
+Also, as I mentioned in the meeting, we still need to decide whether the new billing page will be included in the launch or postponed to Q2. I would really appreciate it if everyone could share their opinion on this by the end of the week.
+
+Thanks so much, and please don't hesitate to reach out if you have any questions!
+
+Best regards,
+Dana
+
+---
+
+From: Omer Katz
+To: Dana Levi; Product Team
+Subject: RE: Q1 launch timeline
+
+Hi Dana,
+
+Thanks for the summary. Yes, I can take ownership of the feature list and I will send it to marketing by January 10.
+
+Regarding the billing page, in my opinion I think we should probably postpone it to Q2, since the payment provider integration is still not stable and we have seen several failures in staging over the past week.
+
+Best,
+Omer
