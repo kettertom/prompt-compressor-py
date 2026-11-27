@@ -1,0 +1,34 @@
+The payment service started failing in production about 20 minutes ago. Here are the recent logs. What is the most likely root cause?
+
+2026-11-27T10:14:02.113Z INFO  [payment-svc] Processing payment for order ORD-88123
+2026-11-27T10:14:02.257Z ERROR [payment-svc] Failed to charge card: upstream timeout after 5000ms (gateway=stripe-eu)
+2026-11-27T10:14:02.258Z INFO  [payment-svc] Retrying payment for order ORD-88123 (attempt 2/3)
+2026-11-27T10:14:07.301Z ERROR [payment-svc] Failed to charge card: upstream timeout after 5000ms (gateway=stripe-eu)
+2026-11-27T10:14:07.302Z INFO  [payment-svc] Retrying payment for order ORD-88123 (attempt 3/3)
+2026-11-27T10:14:12.344Z ERROR [payment-svc] Failed to charge card: upstream timeout after 5000ms (gateway=stripe-eu)
+2026-11-27T10:14:12.345Z ERROR [payment-svc] Payment permanently failed for order ORD-88123
+2026-11-27T10:14:12.346Z ERROR [payment-svc] Unhandled exception
+Traceback (most recent call last):
+  File "/app/payment/service.py", line 214, in charge
+    resp = self.gateway.charge(order.total, order.card_token)
+  File "/app/payment/gateways/stripe.py", line 88, in charge
+    return self._post("/v1/charges", payload)
+  File "/app/payment/gateways/base.py", line 41, in _post
+    r = self.session.post(url, json=payload, timeout=self.timeout)
+  File "/usr/lib/python3.12/site-packages/requests/sessions.py", line 637, in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+  File "/usr/lib/python3.12/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/usr/lib/python3.12/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/usr/lib/python3.12/site-packages/requests/adapters.py", line 532, in send
+    raise ReadTimeout(e, request=request)
+requests.exceptions.ReadTimeout: HTTPSConnectionPool(host='api.stripe-eu.example', port=443): Read timed out. (read timeout=5)
+2026-11-27T10:14:13.002Z INFO  [payment-svc] Health check OK
+2026-11-27T10:14:13.002Z INFO  [payment-svc] Health check OK
+2026-11-27T10:14:13.002Z INFO  [payment-svc] Health check OK
+2026-11-27T10:14:13.002Z INFO  [payment-svc] Health check OK
+2026-11-27T10:14:14.881Z WARN  [payment-svc] Connection pool to api.stripe-eu.example is full (size=10), discarding connection
+2026-11-27T10:14:14.881Z WARN  [payment-svc] Connection pool to api.stripe-eu.example is full (size=10), discarding connection
+2026-11-27T10:14:14.881Z WARN  [payment-svc] Connection pool to api.stripe-eu.example is full (size=10), discarding connection
+2026-11-27T10:14:15.120Z INFO  [payment-svc] Config reloaded: gateway.timeout changed from 30s to 5s (deploy 2026.11.27-3)

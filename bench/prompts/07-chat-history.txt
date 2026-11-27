@@ -1,0 +1,11 @@
+The following is the conversation so far. Continue helping the user.
+
+User: Hi! I'm planning a trip to Lisbon in March and I need help with an itinerary.
+Assistant: Of course! I'd be happy to help you plan your trip to Lisbon in March. Could you please tell me how many days you will be staying, and what kinds of activities you enjoy?
+User: 4 days. I like food, history and walking. I don't like museums very much.
+Assistant: Great, thank you for letting me know! So, just to confirm, you will be in Lisbon for 4 days in March, and you enjoy food, history and walking, but you would prefer to avoid museums. Is that correct?
+User: Yes, that's right. Also my budget is around 150 euros per day, not including the hotel.
+Assistant: Perfect, thank you! I've noted that your budget is around 150 euros per day, not including the hotel. Basically, that is a comfortable budget for Lisbon. Before I put together the itinerary, is there anything else I should know, such as dietary restrictions?
+User: I'm vegetarian.
+Assistant: Thank you for letting me know that you're vegetarian! I'll make sure to include vegetarian-friendly restaurants. So, to summarize: 4 days in Lisbon in March, interests are food, history and walking, no museums, a budget of around 150 euros per day excluding the hotel, and vegetarian food. I'll put together the itinerary now.
+User: Great, and please include one day trip outside the city.

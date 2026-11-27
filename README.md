@@ -8,6 +8,9 @@
 
 Compress prompts **before** sending them to any LLM API. No model required, no API calls, zero overhead. Works with OpenAI, Anthropic, AWS Bedrock, Cohere, or any token-based API.
 
+**No model. No API key. Deterministic. Zero dependencies. Your data never leaves your machine.**
+Most prompt compressors (e.g. LLMLingua) run a language model to decide what to cut. This one uses 30+ rule-based algorithms, so the same input always gives the same output and it is safe for data you can't send anywhere. **At the default level it cut 20% of tokens across 8 real-world prompt types while keeping 94/94 critical instructions** ([benchmark](#benchmark)).
+
 🌐 **Web app**: [prompt-compressor.com](https://prompt-compressor.com)  
 📦 **npm**: [prompt-compressor](https://www.npmjs.com/package/prompt-compressor)  
 🤖 **MCP server** (Claude, Cursor, VS Code): `claude mcp add prompt-compressor -- npx -y prompt-compressor-mcp`
@@ -87,12 +90,14 @@ prompt-compressor input.txt --level low --output compressed.txt
 
 ## Levels
 
-| Level | Algorithms | Typical Reduction |
+| Level | Algorithms | Measured reduction ([benchmark](#benchmark)) |
 |-------|-----------|-------------------|
-| `none` | Whitespace, unicode, ANSI, punctuation | 5–15% |
-| `very-low` | + Filler removal, phrase shortening, JSON/SQL minify, license headers | 15–30% |
-| `low` | + Hedging, meta-commentary, transitions, number normalization, code comments, exact dedup | 25–45% |
-| `medium` | + Fuzzy/ngram/Levenshtein dedup, frequent patterns, TF-IDF, TextRank | 30–70% |
+| `none` | Whitespace, unicode, ANSI, punctuation | 3% avg (0–10%) |
+| `very-low` | + Filler removal, phrase shortening, JSON/SQL minify, license headers | 9% avg (1–31%) |
+| `low` ✅ default | + Hedging, meta-commentary, transitions, number normalization, code comments, exact dedup | **20% avg (0–61%)**, 100% of critical facts kept |
+| `medium` ⚠️ | + Fuzzy/ngram/Levenshtein dedup, frequent patterns, TF-IDF, TextRank | 86% avg, but **only 34% of critical facts kept** |
+
+> ⚠️ **`medium` is lossy summarization, not compression.** It keeps a fraction of the sentences and can drop instructions, numbers and IDs. Use it only for background context you'd be happy to see summarized, never for system prompts, tool output or anything with rules in it. Savings are biggest on code, logs and repeated content. Prose that is already concise saves only a few percent at the safe levels.
 
 ## Variable Protection
 
@@ -106,6 +111,48 @@ result = compress("Hello {{name}}, query: {user_query}", level="medium")
 Disable with `protect_vars=False`.
 
 ---
+
+## Benchmark
+
+The same 8 production-style prompts and must-keep facts as the [JS package benchmark](https://github.com/kettertom/prompt-compressor#benchmark), run against this Python implementation: support system prompt, RAG context, agent instructions, tool JSON, code review, logs, chat history and an email thread ([`bench/prompts`](bench/prompts), [`bench/facts.json`](bench/facts.json)).
+
+### Results at the default level (`low`)
+
+| Prompt | Tokens before | Tokens after | Saved | $ saved per 1M calls* | Must-keep facts kept |
+|---|---:|---:|---:|---:|:---:|
+| Support bot system prompt | 325 | 306 | **6%** | $57 | 12/12 ✅ |
+| RAG context (4 retrieved docs) | 431 | 338 | **22%** | $279 | 13/13 ✅ |
+| Agent instructions + tool specs | 333 | 316 | **5%** | $51 | 17/17 ✅ |
+| Tool output (JSON orders) | 448 | 398 | **11%** | $150 | 11/11 ✅ |
+| Code review request (Python) | 292 | 114 | **61%** | $534 | 9/9 ✅ |
+| Production logs + stack trace | 873 | 564 | **35%** | $927 | 9/9 ✅ |
+| Chat history (8 turns) | 310 | 309 | **0%** | $3 | 11/11 ✅ |
+| Email thread to summarize | 327 | 312 | **5%** | $45 | 12/12 ✅ |
+| **Total** | **3,339** | **2,657** | **20%** | **$2,046** | **94/94** |
+
+\* At $3 per 1M input tokens. For your model, multiply by (your price ÷ 3). Tokens counted with OpenAI's `o200k_base` tokenizer.
+
+### By risk level
+
+| Level | Avg. saved | Must-keep facts kept |
+|---|---:|:---:|
+| `very-low` | 9% | 94/94 (100%) |
+| `low` | 20% | 94/94 (100%) |
+| `medium` | 86% | 32/94 (34%) |
+
+Facts lost (if any):
+
+- `medium` · Support bot system prompt: lost 10/12
+- `medium` · RAG context (4 retrieved docs): lost 11/13
+- `medium` · Agent instructions + tool specs: lost 10/17
+- `medium` · Tool output (JSON orders): lost 11/11
+- `medium` · Production logs + stack trace: lost 8/9
+- `medium` · Chat history (8 turns): lost 5/11
+- `medium` · Email thread to summarize: lost 7/12
+
+The exact facts lost are listed in [`bench/results.json`](bench/results.json).
+
+**Reproduce it:** `pip install tiktoken && python bench/run.py`
 
 ## Algorithm Reference
 
